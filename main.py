@@ -1,42 +1,51 @@
 ## sudoku solver by joshua
 import sudokus
 
-def main():
+def SudokuSolver(SUDOKU):
     
     SIZE = 9
     Loops = 0
-    SUDOKU = sudokus.Sudoku1
+    SUDOKU = SUDOKU
     
     def GenArray():
         array = []
         for i in range(SIZE):
             sub_array = []
             for j in range(SIZE):
-                sub_array.append({
-                    "state": False,
-                    "options": [1,2,3,4,5,6,7,8,9],
-                    "number": 0
-                    })
+                #Set defaults
+                if SUDOKU[i][j] == 0:
+                    sub_array.append({
+                        "state": False,
+                        "options": [1,2,3,4,5,6,7,8,9],
+                        "number": 0
+                        })
+                if SUDOKU[i][j] != 0:
+                    sub_array.append({
+                        "state": True,
+                        "options": None,
+                        "number": int(SUDOKU[i][j])
+                        })
             array.append(sub_array)
         return array
     
     def status():
-            for i in range(SIZE):
-                for j in range(SIZE):
-                    if SUDOKU[i][j] == 0:
-                        return False
-            return True
+        for i in range(SIZE):
+            for j in range(SIZE):
+                if SUDOKU[i][j] == 0:
+                    return False
+        return True
+    
+    def OnesAvailabe():
+        for i in range(SIZE):
+            for j in range(SIZE):
+                if struct[i][j]["state"] == True:
+                    continue
+                if struct[i][j]["state"] == False:
+                    if len(struct[i][j]["options"]) == 1:
+                        return True
+        return False
 
     struct = GenArray()
-
-    # Initiale setup
-    for i in range(SIZE):
-        for j in range(SIZE):
-            #Set defaults
-            if SUDOKU[i][j] != 0:
-                struct[i][j]["state"] = True
-                struct[i][j]["options"] = None
-                struct[i][j]["number"] = int(SUDOKU[i][j])
 
     solved = False
 
@@ -66,6 +75,14 @@ def main():
                         if option in block:
                             struct[i][j]["options"].remove(option)
                             continue
+        if not OnesAvailabe():
+            """
+            A guess will need to be made here, for a cell with to options.
+            If the guess doesn't work the other instance needs to be taken 
+            """
+            print("Currently unsolvable")
+            print(struct)
+            return None
 
         #fill in
         for i in range(SIZE):
@@ -74,7 +91,7 @@ def main():
                     continue
                 if struct[i][j]["state"] == False:
                     if len(struct[i][j]["options"]) == 1:
-                        number = struct[i][j]["options"][0]
+                        number = int(struct[i][j]["options"][0])
                         struct[i][j]["state"] = True
                         struct[i][j]["options"] = None
                         struct[i][j]["number"] = number
@@ -86,6 +103,7 @@ def main():
     print("----------------")
     print(SUDOKU, f"Solved after {Loops} iterations")
     print("----------------")
+    return SUDOKU
 
 if __name__ == "__main__":
-    main()
+    print(SudokuSolver(sudokus.Sudoku2))
