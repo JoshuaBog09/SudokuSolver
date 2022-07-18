@@ -45,13 +45,57 @@ def SudokuSolver(SUDOKU):
                         return True
         return False
 
-    struct = GenArray()
+    def Block(i,j):
+        block = SUDOKU[3*(i // 3)][3*(j // 3):3*(j // 3)+3] + \
+            SUDOKU[3*(i // 3)+1][3*(j // 3):3*(j // 3)+3] + \
+                SUDOKU[3*(i // 3)+2][3*(j // 3):3*(j // 3)+3]
+        return block
 
-    solved = False
+    def Horizontal(i):
+        return SUDOKU[i]
 
-    #Solver
-    while not solved:
-        #analyse
+    def Vertical(j):
+        return [row[j] for row in SUDOKU]
+
+    def Options_Horizontal(I,J):
+        possibilities = []
+        for x in range(SIZE):
+            if x == J:
+                possibilities.append(0)
+                continue
+            if struct[I][x]["state"] == True:
+                possibilities.append(1)
+                continue
+            if struct[I][x]["state"] == False:
+                possibilities.append(struct[I][x]["options"])
+        return possibilities
+
+    def Options_Vertical(I,J):
+        possibilities = []
+        for y in range(SIZE):
+            if y == I:
+                continue
+            if struct[y][J]["state"] == True:
+                continue
+            if struct[y][J]["state"] == False:
+                possibilities.extend(struct[y][J]["options"])
+        return possibilities
+
+    def Options_Block(I,J):
+        possibilities = []
+        for y in range(3):
+            for x in range(3):
+                X = 3*(J // 3)+x
+                Y = 3*(I // 3)+y
+                if (Y == I) and (X == J):
+                    continue
+                if struct[Y][X]["state"] == True:
+                    continue
+                if struct[Y][X]["state"] == False:
+                    possibilities.extend(struct[Y][X]["options"])
+        return possibilities
+
+    def Analyse(struct):
         for i in range(SIZE):
             for j in range(SIZE):
                 if struct[i][j]["state"] == True:
@@ -61,30 +105,30 @@ def SudokuSolver(SUDOKU):
                     #scanning options
                     for option in options:
                         #horizontal
-                        if option in SUDOKU[i]:
+                        if option in Horizontal(i):
                             struct[i][j]["options"].remove(option)
                             continue
                         #vertical
-                        if option in [row[j] for row in SUDOKU]:
+                        if option in Vertical(j):
                             struct[i][j]["options"].remove(option)
                             continue
                         #block
-                        block = SUDOKU[3*(i // 3)][3*(j // 3):3*(j // 3)+3] + \
-                            SUDOKU[3*(i // 3)+1][3*(j // 3):3*(j // 3)+3] + \
-                                SUDOKU[3*(i // 3)+2][3*(j // 3):3*(j // 3)+3]
-                        if option in block:
+                        if option in Block(i,j):
                             struct[i][j]["options"].remove(option)
                             continue
-        if not OnesAvailabe():
-            """
-            A guess will need to be made here, for a cell with to options.
-            If the guess doesn't work the other instance needs to be taken 
-            """
-            print("Currently unsolvable")
-            print(struct)
-            return None
+        return struct
 
-        #fill in
+    struct = GenArray()
+
+    solved = False
+
+    #Solver
+    while not solved:
+
+        struct = Analyse(struct)
+
+        #fill in (First scan is redundant, the second scan takes care of everything)
+        # ↓ redundancy below (essentialy does the same as the loops later but less checks happen)
         for i in range(SIZE):
             for j in range(SIZE):
                 if struct[i][j]["state"] == True:
@@ -97,13 +141,33 @@ def SudokuSolver(SUDOKU):
                         struct[i][j]["number"] = number
                         SUDOKU[i][j] = number
 
+        struct = Analyse(struct)
+        if not OnesAvailabe():
+            for i in range(SIZE):
+                for j in range(SIZE):
+                    if struct[i][j]["state"] == True:
+                        continue
+                    if struct[i][j]["state"] == False:
+                        options = struct[i][j]["options"][:]
+                        for option in options:
+                            if option not in Options_Block(i,j):
+                                struct[i][j]["state"] = True
+                                struct[i][j]["options"] = None
+                                struct[i][j]["number"] = option
+                                SUDOKU[i][j] = option
+                                struct = Analyse(struct)
+
+        if Loops >= 1_000:
+            print("Failed")
+            return None
         solved = status()
         Loops += 1
 
     print("----------------")
     print(SUDOKU, f"Solved after {Loops} iterations")
     print("----------------")
+
     return SUDOKU
 
 if __name__ == "__main__":
-    print(SudokuSolver(sudokus.Sudoku2))
+    SudokuSolver(sudokus.Sudoku3)
