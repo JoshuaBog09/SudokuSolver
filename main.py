@@ -109,8 +109,8 @@ def SudokuSolver(SUDOKU):
 
     def solve(grid):
         def find_empty(grid):
-            for i in range(9):
-                for j in range(9):
+            for i in range(SIZE):
+                for j in range(SIZE):
                     if grid[i][j] == 0:
                         return i,j
             return None
