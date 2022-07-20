@@ -1,11 +1,11 @@
 ## sudoku solver by joshua
+import copy
 import sudokus
 
 def SudokuSolver(SUDOKU):
     
     SIZE = 9
     Loops = 0
-    SUDOKU = SUDOKU
     
     def GenArray():
         array = []
@@ -45,41 +45,17 @@ def SudokuSolver(SUDOKU):
                         return True
         return False
 
-    def Block(i,j):
+    def Block(i,j,SUDOKU=SUDOKU):
         block = SUDOKU[3*(i // 3)][3*(j // 3):3*(j // 3)+3] + \
             SUDOKU[3*(i // 3)+1][3*(j // 3):3*(j // 3)+3] + \
                 SUDOKU[3*(i // 3)+2][3*(j // 3):3*(j // 3)+3]
         return block
 
-    def Horizontal(i):
+    def Horizontal(i,SUDOKU=SUDOKU):
         return SUDOKU[i]
 
-    def Vertical(j):
+    def Vertical(j,SUDOKU=SUDOKU):
         return [row[j] for row in SUDOKU]
-
-    def Options_Horizontal(I,J):
-        possibilities = []
-        for x in range(SIZE):
-            if x == J:
-                possibilities.append(0)
-                continue
-            if struct[I][x]["state"] == True:
-                possibilities.append(1)
-                continue
-            if struct[I][x]["state"] == False:
-                possibilities.append(struct[I][x]["options"])
-        return possibilities
-
-    def Options_Vertical(I,J):
-        possibilities = []
-        for y in range(SIZE):
-            if y == I:
-                continue
-            if struct[y][J]["state"] == True:
-                continue
-            if struct[y][J]["state"] == False:
-                possibilities.extend(struct[y][J]["options"])
-        return possibilities
 
     def Options_Block(I,J):
         possibilities = []
@@ -117,6 +93,38 @@ def SudokuSolver(SUDOKU):
                             struct[i][j]["options"].remove(option)
                             continue
         return struct
+    
+    def possible(grid, y, x, n):
+        # Horizontal
+        if n in Horizontal(y,grid):
+            return False
+        # Vertical
+        if n in Vertical(x,grid):
+            return False
+        # Block
+        if n in Block(y,x,grid):
+            return False
+
+        return True
+
+    def solve(grid):
+        def find_empty(grid):
+            for i in range(9):
+                for j in range(9):
+                    if grid[i][j] == 0:
+                        return i,j
+            return None
+        empty = find_empty(grid)
+        if not empty:
+            return True
+        y, x = empty
+        options = struct[y][x]["options"][:]
+        for option in options:
+            if possible(grid, y, x, option):
+                grid[y][x] = option
+                if solve(grid):
+                    return True
+                grid[y][x] = 0
 
     struct = GenArray()
 
@@ -125,6 +133,7 @@ def SudokuSolver(SUDOKU):
     #Solver
     while not solved:
 
+        before_iter = copy.deepcopy(SUDOKU)
         struct = Analyse(struct)
 
         #fill in (First scan is redundant, the second scan takes care of everything)
@@ -157,17 +166,15 @@ def SudokuSolver(SUDOKU):
                                 SUDOKU[i][j] = option
                                 struct = Analyse(struct)
 
-        if Loops >= 1_000:
-            print("Failed")
-            return None
-        solved = status()
-        Loops += 1
+        after_iter = copy.deepcopy(SUDOKU)
 
-    print("----------------")
-    print(SUDOKU, f"Solved after {Loops} iterations")
-    print("----------------")
+        if after_iter == before_iter:
+            solve(SUDOKU)
+            return(SUDOKU)
+        
+        solved = status()
 
     return SUDOKU
 
 if __name__ == "__main__":
-    SudokuSolver(sudokus.Sudoku3)
+    SudokuSolver(sudokus.Sudoku3))
