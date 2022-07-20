@@ -4,7 +4,7 @@ import main
 
 class TestSudokuSolver(unittest.TestCase):
 
-    def test_sudoku1(self):
+    def test_Easy1(self):
         self.assertEqual(main.SudokuSolver(sudokus.Sudoku1),(
             [[4, 6, 5, 7, 3, 8, 1, 9, 2], 
              [3, 7, 8, 2, 9, 1, 5, 6, 4],
@@ -16,7 +16,7 @@ class TestSudokuSolver(unittest.TestCase):
              [5, 3, 2, 1, 4, 6, 9, 8, 7],
              [7, 9, 6, 5, 8, 2, 3, 4, 1]]))
     
-    def test_sudoku2(self):
+    def test_Easy2(self):
         self.assertEqual(main.SudokuSolver(sudokus.Sudoku2),(
             [[1, 8, 2, 3, 7, 5, 4, 6, 9], 
             [3, 5, 9, 6, 4, 8, 2, 7, 1],
@@ -28,7 +28,7 @@ class TestSudokuSolver(unittest.TestCase):
             [8, 9, 7, 2, 5, 4, 1, 3, 6],
             [5, 1, 3, 9, 6, 7, 8, 2, 4]]))
 
-    def test_sudoku3(self):
+    def test_Medium(self):
         self.assertEqual(main.SudokuSolver(sudokus.Sudoku3),(
             [[8, 7, 1, 6, 5, 9, 2, 3, 4],
              [4, 5, 9, 3, 1, 2, 6, 8, 7], 
@@ -39,6 +39,18 @@ class TestSudokuSolver(unittest.TestCase):
              [2, 4, 3, 5, 9, 1, 8, 7, 6], 
              [1, 6, 8, 2, 4, 7, 3, 5, 9], 
              [5, 9, 7, 8, 3, 6, 4, 1, 2]]))
+    
+    def test_Hard(self):
+        self.assertEqual(main.SudokuSolver(sudokus.Sudoku4),(
+            [[3, 5, 1, 2, 8, 6, 4, 9, 7],
+             [4, 9, 2, 1, 5, 7, 6, 3, 8], 
+             [7, 8, 6, 9, 3, 4, 5, 1, 2], 
+             [2, 7, 5, 4, 6, 9, 1, 8, 3], 
+             [9, 3, 8, 5, 2, 1, 7, 6, 4], 
+             [6, 1, 4, 8, 7, 3, 2, 5, 9], 
+             [8, 2, 9, 6, 4, 5, 3, 7, 1], 
+             [1, 6, 3, 7, 9, 2, 8, 4, 5], 
+             [5, 4, 7, 3, 1, 8, 9, 2, 6]]))
 
 if __name__ == '__main__':
     unittest.main()
