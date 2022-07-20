@@ -170,11 +170,11 @@ def SudokuSolver(SUDOKU):
 
         if after_iter == before_iter:
             solve(SUDOKU)
-            return(SUDOKU)
+            return SUDOKU
         
         solved = status()
 
     return SUDOKU
 
 if __name__ == "__main__":
-    SudokuSolver(sudokus.Sudoku3))
+    SudokuSolver(sudokus.Sudoku3)
